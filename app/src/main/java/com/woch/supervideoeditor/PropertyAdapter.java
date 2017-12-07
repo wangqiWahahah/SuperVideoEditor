@@ -1,7 +1,5 @@
 package com.woch.supervideoeditor;
 
-import android.content.Intent;
-import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,8 +13,6 @@ import com.woch.library.SuperVideoView;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.content.Context.MEDIA_PROJECTION_SERVICE;
 
 /**
  * Created by wangdake on 2017/11/24.
@@ -63,6 +59,8 @@ public class PropertyAdapter extends RecyclerView.Adapter {
             @Override
             public void onClick(View view) {
 
+
+                onItemListener.onItemClick(view, position);
                 if (position == 0){
 
                     superVideoConfigure = new SuperVideoConfigure.Builder().setExeType(SuperVideoConfigure.EXE_GIF).setInput(context.getPath(context, uri)).setOutput("/storage/emulated/0/Pictures/VideoEditor3/t1oo.gif").setGifTime(new String[]{"3","5","100x100"}).builder();
@@ -146,19 +144,14 @@ public class PropertyAdapter extends RecyclerView.Adapter {
 
                 }else if (position == 10){
 
-                    //superVideoConfigure = new SuperVideoConfigure.Builder().setExeType(SuperVideoConfigure.EXE_SCREENCAP).setOutput("/storage/emulated/0/Pictures/VideoEditor3/cap.mp4").builder();
+                    superVideoConfigure = new SuperVideoConfigure.Builder().setExeType(SuperVideoConfigure.EXE_GET_IMAGE).setInput(context.getPath(context, uri)).setOutput("/storage/emulated/0/Pictures/VideoEditor3/oyes%d.jpg").builder();
 
 
-                    MediaProjectionManager projectionManager = (MediaProjectionManager) context.getSystemService(MEDIA_PROJECTION_SERVICE);
 
-                    Intent captureIntent= null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                        captureIntent = projectionManager.createScreenCaptureIntent();
-                        context.startActivityForResult(captureIntent, 111);
-                    }
 
                 }
-                SuperVideo.getInstance().exeCmdFFmpeg(superVideoConfigure, context);
+                if (position < 11)
+                    SuperVideo.getInstance().exeCmdFFmpeg(superVideoConfigure, context);
 
             }
         });

@@ -1,9 +1,12 @@
 package com.woch.library;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
@@ -88,7 +91,13 @@ public class SuperVideoView extends ViewGroup{
 
         for (int i=0;i<ImageLs.size();i++){
             ImageView imageView = new ImageView(getContext());
-            imageView.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_launcher));
+            try {
+                Bitmap bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(ImageLs.get(i)), imageWidth, height, true);
+                BitmapDrawable bitmapDrawable = new BitmapDrawable(getContext().getResources(), bitmap);
+                imageView.setImageDrawable(bitmapDrawable);
+            }catch (Exception e){
+                imageView.setImageDrawable(ContextCompat.getDrawable(getContext(), Integer.parseInt(ImageLs.get(i))));
+            }
             imageView.setScaleType(ImageView.ScaleType.CENTER);
             imageView.setLayoutParams(layoutParams);
             if (layoutParams != null);{
@@ -106,10 +115,14 @@ public class SuperVideoView extends ViewGroup{
 
     private LayoutParams layoutParams;
     private int height;
+
+    private int imageWidth;
+
     private LayoutParams initParams() {
         if (layoutParams == null){
             height = Math.min((mWidth-40)/ImageLs.size(), mHeight);
-            layoutParams = new LayoutParams((mWidth-40)/ImageLs.size(), height);
+            imageWidth = (mWidth-40)/ImageLs.size();
+            layoutParams = new LayoutParams(imageWidth, height);
         }
 
         return layoutParams;
@@ -123,7 +136,7 @@ public class SuperVideoView extends ViewGroup{
 
         measureHelp(widthMeasureSpec, true);
         measureHelp(heightMeasureSpec, false);
-        Log.e("LayoutParams", mHeight+"===========onMeasure============="+mWidth/ImageLs.size());
+//        Log.e("LayoutParams", mHeight+"===========onMeasure============="+mWidth/ImageLs.size());
         if (MAX_WIDTH == 0){
             MAX_WIDTH = mWidth;
             rangeRX = mWidth;

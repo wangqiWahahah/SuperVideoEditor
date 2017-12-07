@@ -2,7 +2,6 @@ package com.woch.library;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
@@ -78,6 +77,7 @@ public class SuperVideo {
 
             case EXE_GIF:
 
+                type = EXE_GIF;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
                 gifStr = superVideoConfigure.getGifTime();
@@ -91,6 +91,7 @@ public class SuperVideo {
 
             case EXE_COMPRESS:
 
+                type = EXE_COMPRESS;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
                 String[] compressP = superVideoConfigure.getCompressProperty();
@@ -110,6 +111,7 @@ public class SuperVideo {
 
             case EXE_SCREENSHOT:
 
+                type = EXE_SCREENSHOT;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
                 String ss = superVideoConfigure.getScreenShot();
@@ -124,6 +126,7 @@ public class SuperVideo {
 
             case EXE_SPLIT_A_V:
 
+                type = EXE_SPLIT_A_V;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
                 mCmd = "-vn -i " + inputLs + " -y -f " + outputLs;
@@ -136,6 +139,7 @@ public class SuperVideo {
 
             case EXE_TRANSCODE:
 
+                type = EXE_TRANSCODE;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
                 String[] compressT = superVideoConfigure.getTransCode();
@@ -154,6 +158,7 @@ public class SuperVideo {
 
             case EXE_MARK:
 
+                type = EXE_MARK;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
                 List<MarkEntity> markls = superVideoConfigure.getMark();
@@ -205,6 +210,7 @@ public class SuperVideo {
 
             case EXE_FADE:
 
+                type = EXE_FADE;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
                 String t = superVideoConfigure.getFade();
@@ -217,6 +223,7 @@ public class SuperVideo {
 
             case EXE_BSF:
 
+                type = EXE_BSF;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
                 String bsf = superVideoConfigure.getBsf();
@@ -229,6 +236,8 @@ public class SuperVideo {
 
             case EXE_CROP:
 
+
+                type = EXE_CROP;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
                 String[] strings = superVideoConfigure.getVideoCrop();
@@ -241,6 +250,7 @@ public class SuperVideo {
 
             case EXE_IMAGE:
 
+                type = EXE_IMAGE;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
                 sCmd.append("-i ").append(inputLs).append(" -vf split[main][tmp];[tmp]crop=iw:ih/2:0:0,vflip[flip];[main][flip]overlay=0:H/2 -y ").append(outputLs);
@@ -253,9 +263,10 @@ public class SuperVideo {
 
             case EXE_GET_IMAGE:
 
+                type = EXE_GET_IMAGE;
                 inputLs = superVideoConfigure.getInput();
                 outputLs = superVideoConfigure.getOutput();
-                sCmd.append("-i ").append(inputLs).append(" -vf fps=fps=1 -y ").append(outputLs);
+                sCmd.append("-i ").append(inputLs).append(" -y -f image2 ").append("-r").append(" 1 ").append(outputLs);
                 Log.e("supervideoeditor", "mCmd============"+sCmd);
                 cmd = sCmd.toString().split(" ");
                 exeFFmpeg(cmd,context);
@@ -264,20 +275,36 @@ public class SuperVideo {
 
             case EXE_SCREENCAP:
 
-                inputLs = superVideoConfigure.getInput();
-                outputLs = superVideoConfigure.getOutput();
-
-                //-f x11grab -s 1600x900 -r 50 -vcodec libx264 –preset:v ultrafast –tune:v zerolatency -crf 18
-//                sCmd.append("-f x11grab -r 30 -s 432*768 -vcodec h264 –preset:v ultrafast –tune:v zerolatency -crf 18 ").append(outputLs);
-//                Log.e("supervideoeditor", "mCmd============"+sCmd);
-//                cmd = sCmd.toString().split(" ");
-//                exeFFmpeg(cmd,context);
-
                 break;
 
         }
 
 
+        path = superVideoConfigure.getOutput();
+
+    }
+
+    private int type;
+    private String path;
+
+    private OnSuccessListener onSuccessListener;
+
+    public void setOnSuccessListener(OnSuccessListener onSuccessListener){
+        this.onSuccessListener = onSuccessListener;
+    }
+
+    private int duration;
+
+    public void setVideoTime(int duration) {
+
+        this.duration = duration;
+        Log.e("SuperVideo","--------------setVideoTime-------------"+duration);
+
+    }
+
+    public interface OnSuccessListener{
+
+        public void onSuccess(int type, String path);
 
     }
 
@@ -288,9 +315,7 @@ public class SuperVideo {
             fFmpeg.execute(cmd, new FFmpegExecuteResponseHandler() {
                 @Override
                 public void onSuccess(String message) {
-
-                    Log.e("supervideoeditor", "onSuccess------"+message);
-                    Toast.makeText(context, "成功", Toast.LENGTH_SHORT).show();
+                    onSuccessListener.onSuccess(type, path);
 
                 }
 
